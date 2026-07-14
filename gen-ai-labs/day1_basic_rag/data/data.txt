@@ -1,0 +1,47 @@
+Technical Report: HobbyFi Copilot Architecture
+Role: AI Engineer Assessment | Candidate: [Your Name]
+1. Executive Summary
+The HobbyFi Copilot is an agentic CRM interface designed to streamline vendor operations. By moving from a manual dashboard-centric model to a conversational AI-first model, vendors can perform complex queries and data-driven updates with natural language, governed by strict human-in-the-loop (HITL) safety protocols.
+2. Architecture Overview
+The system employs a decoupled agentic pattern utilizing the Mastra framework for orchestration and an MCP (Model Context Protocol) server for secure database interactions.
+	•	Workflow Logic:
+	1.	Orchestrator (Mastra): Manages conversational state and intent classification.
+	2.	Tool Layer (MCP): Abstracts database queries/writes into secure, standardized tools.
+	3.	Approval Gate: A stateful "Human-in-the-Loop" gate for all write-operations.
+(Insert Mermaid Diagram Here)
+3. Technology Stack
+Layer	Technology	Rationale
+Orchestration	Mastra	Native agentic workflows & robust tool-calling.
+Tool Interface	MCP (Model Context Protocol)	Standardized, secure data access; platform-agnostic.
+Memory	Vector DB (Qdrant)	Entity-based memory to persist vendor-specific context.
+LLM Inference	GPT-4o / Claude 3.5	High precision for complex CRM data reasoning.
+4. Memory & Guardrails Strategy
+Entity-Based Memory
+Rather than relying on raw chat history, the system implements Entity-Based Memory. It stores vendor preferences and operational patterns (e.g., "typically manages badminton courts") in a Vector DB, allowing the Copilot to provide personalized assistance during repeat sessions.
+Guardrails
+	•	Input Sanitization: All vendor prompts are passed through a Pydantic-based schema validator to ensure inputs match expected CRM data formats.
+	•	Prompt Injection Defense: The agent is system-prompted to ignore any request that attempts to alter database schema or global system configurations.
+	•	Authorization: The agent operates under a restricted CRM user context, ensuring vendors can only access data belonging to their vendor_id.
+5. Workflow Orchestration: The "HITL" Gate
+For sensitive operations (e.g., updating membership dates), the system follows a Two-Phase Commit:
+	1.	Phase 1 (Proposal): The LLM identifies the tool request and generates a ProposedChange object.
+	2.	Phase 2 (Approval): The pipeline pauses. The UI renders the proposal for vendor verification.
+	3.	Phase 3 (Execution): Only after the vendor confirms does the MCP server commit the SQL transaction.
+6. Mock Data Schema (Assumptions)
+For the purpose of this architecture, the following schema is assumed for vendor data:
+JSON
+
+{
+  "vendor_id": "uuid",
+  "dashboard_stats": {
+    "revenue_daily": 0.0,
+    "active_trials": 0
+  },
+  "users": [
+    {
+      "user_id": "uuid",
+      "membership_status": "active | trial | expired",
+      "associated_game": "string"
+    }
+  ]
+}
