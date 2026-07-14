@@ -16,7 +16,6 @@ To maintain daily engineering habits by:
 ## 📂 Structure
 - `algorithms/`: Daily solutions organized by topic/date.
 - `gen-ai-labs/`: Small experiments, prompt chains, and agentic workflows.
-- `notes/`: Insights on AI-assisted development and lessons learned.
 
 ## 💡 Engineering Philosophy
 I believe in "AI-assisted" over "AI-generated." Every piece of code here is reviewed, tested, and optimized. I focus on understanding the *why* behind the code, ensuring that AI output is treated as a draft for professional refinement.
