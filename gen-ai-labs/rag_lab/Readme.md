@@ -1,47 +1,47 @@
 # RAG Evolution Lab 🧠
 
-This folder documents my daily engineering journey in building robust Retrieval-Augmented Generation (RAG) systems. Instead of "vibe coding" in isolation, I am iterating on architectural patterns to solve real-world document retrieval challenges.
+A professional technical log documenting the development of robust, production-grade Retrieval-Augmented Generation (RAG) systems. This repository tracks the transition from basic pipelines to agentic, layout-aware AI architectures.
 
 ## 🚀 Lab Progress
 
-### Day 1: Basic RAG Implementation
-* **Focus:** Establishing the core RAG pipeline.
-* **Architecture:** Implemented a standard RAG flow using `RecursiveCharacterTextSplitter`, `ChromaDB` for vector storage, and `Groq (Llama-3)` for generation.
-* **Key Takeaway:** Understanding the dependency flow between document loaders, embedding models, and LLM orchestration via LangChain.
+### Day 1: Basic RAG Pipeline
+*   **Focus:** MVP setup using standard text extraction and vector storage.
+*   **Architecture:** Implemented core RAG flow: `TextLoader` -> `RecursiveCharacterTextSplitter` -> `ChromaDB` -> `Groq (Llama-3)`.
+*   **Key Takeaway:** Understanding the fundamental dependency flow in LangChain.
 
-### Day 2: Parent-Document Retrieval (Chunking Strategy)
-* **Focus:** Solving context loss in small-chunk retrieval.
-* **Architecture:** Transitioned from a flat chunking strategy to a **Parent-Document Retrieval** pattern.
-    * **Child Chunks (200 chars):** Used for high-precision semantic search.
-    * **Parent Chunks (1000 chars):** Passed to the LLM to preserve full surrounding context during generation.
-* **Key Takeaway:** Learned that intelligent chunking is superior to brute-forcing context windows. Document structure and retrieval granularity directly impact the accuracy of the AI's output.
+### Day 2: Parent-Document Retrieval
+*   **Focus:** Solving context fragmentation.
+*   **Architecture:** Implemented `ParentDocumentRetriever` with distinct chunking strategies: 
+    *   **Child Chunks:** Small, optimized for high-precision vector similarity.
+    *   **Parent Chunks:** Large, optimized for LLM context (tables/flowcharts).
+*   **Key Takeaway:** Hierarchical chunking significantly improves retrieval relevance for technical documentation.
 
-## 🛠 Tech Stack
-* **Orchestration:** LangChain (LCEL)
-* **Inference:** Groq API (`llama-3.3-70b-versatile`)
-* **Embeddings:** HuggingFace `all-MiniLM-L6-v2`
-* **Storage:** ChromaDB, `InMemoryStore`
-
-## ⚙️ Quick Start
-
-1. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-2. **Configure Environment:**
-   Create a `.env` file in this directory:
-   ```env
-   GROQ_API_KEY=your_groq_api_key_here
-   ```
-
-3. **Run the Script:**
-   ```bash
-   python main.py
-   ```
-
-## 💡 Engineering Philosophy
-Every script in this lab is reviewed, tested, and documented. I prioritize **modular architecture** (e.g., separating `parser_config.py` from `main.py`) to ensure that the code is maintainable and production-ready.
+### Day 3: Intelligent PDF Parsing & Framework Alignment
+*   **Focus:** Handling complex layouts (tables/flowcharts) and framework interoperability.
+*   **Key Implementations:**
+    *   **LlamaParse Integration:** Replaced basic loaders with `LlamaParse` to convert visually dense PDFs into LLM-ready Markdown.
+    *   **Adapter Pattern:** Built a bridge to convert `LlamaIndex` Document objects into `LangChain` Document objects (mapping `.text` to `.page_content`).
+    *   **Persistence Management:** Solved vector store cross-contamination by isolating data into custom `Chroma` collections.
 
 ---
+
+## 🛠 Framework Comparisons
+
+### 1. PyMuPDF vs. LlamaParse
+| Feature | PyMuPDF | LlamaParse |
+| :--- | :--- | :--- |
+| **Approach** | Rule-based, local text extraction. | Vision-Language Models (VLMs). |
+| **Use Case** | High-speed, clean digital-native text. | Complex layouts, tables, charts. |
+| **Architecture** | Purely local/offline. | Cloud-native API. |
+
+### 2. LlamaIndex Document vs. LangChain Document
+*   **LlamaIndex Document:** Structured as a "Node" with built-in graph relationships (`PREVIOUS`, `PARENT`). Optimized for deep indexing and advanced RAG orchestration.
+*   **LangChain Document:** A lightweight, generic dictionary wrapper. Optimized for universal pipeline compatibility and multi-tool orchestration.
+*   **Integration:** Since they differ, I implemented a manual converter: `Document(page_content=doc.text, metadata=doc.metadata)` to bridge the schema mismatch.
+
+---
+
+## 💡 Engineering Philosophy
+I treat my data pipeline as a system, not just a script. By modularizing configurations (`parser_config.py`) and isolating vector stores, I ensure the system is maintainable, scalable, and professional.
+
 *Maintained by Vishnu P.*
